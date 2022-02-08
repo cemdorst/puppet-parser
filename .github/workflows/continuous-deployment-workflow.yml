@@ -11,7 +11,7 @@ on:
 jobs:
   image:
     name: Image Creation
-    runs-on: python:3.7-alpine
+    runs-on: ubuntu-latest
 
     env:
       DOCKER_IMAGE_NAME: cemdorst/puppet-parser
@@ -20,12 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install docker
-      run: |
-        apk add docker
-    - name: Install bash 
-      run: |
-        apk add bash
     - name: Build and Tag
       env:
         IMAGE_TAG: ${{ github.sha }}

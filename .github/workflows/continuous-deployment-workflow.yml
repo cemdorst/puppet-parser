@@ -11,9 +11,8 @@ on:
 jobs:
   image:
     name: Image Creation
-    runs-on: shared
     container:
-      image: python:3.7-alpine
+      image: ubuntu-latest
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
 

@@ -31,7 +31,7 @@ jobs:
       uses: anchore/scan-action@v3
       id: scan
       with:
-        image: $DOCKER_IMAGE_NAME:$IMAGE_TAG
+        image: cemdorst/puppet-parser:latest
         fail-build: true
         severity-cutoff: high
         acs-report-enable: true

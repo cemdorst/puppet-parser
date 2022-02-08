@@ -11,10 +11,7 @@ on:
 jobs:
   image:
     name: Image Creation
-    container:
-      image: ubuntu-latest
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
+    runs-on: ubuntu-latest
 
     env:
       DOCKER_IMAGE_NAME: cemdorst/puppet-parser

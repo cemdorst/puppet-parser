@@ -1,0 +1,58 @@
+name: Build and Push
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Dockerfile'
+      - 'entrypoint.sh'
+
+jobs:
+  image:
+    name: Image Creation
+    runs-on: self-hosted 
+    container:
+      image: python:3.7-alpine
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+
+    env:
+      DOCKER_IMAGE_NAME: cemdorst/puppet-parser
+      DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+      DOCKER_USER: cemdorst
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install docker
+      run: |
+        apk add docker
+    - name: Install bash 
+      run: |
+        apk add bash
+    - name: Build and Tag
+      env:
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker login --username=$DOCKER_USER --password=$DOCKER_PASS
+        docker build -t $DOCKER_IMAGE_NAME:$IMAGE_TAG -t $DOCKER_IMAGE_NAME:latest .
+
+    - name: Scan and Push
+      uses: anchore/scan-action@v3
+      id: scan
+      with:
+        image: "$DOCKER_IMAGE_NAME:$IMAGE_TAG"
+        fail-build: true
+        severity-cutoff: high
+        acs-report-enable: true
+    - name: upload Anchore scan SARIF report
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif }}
+    - name: Inspect action SARIF report
+      run: cat ${{ steps.scan.outputs.sarif }}
+
+    - name: push image to Dockerhub
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-latest

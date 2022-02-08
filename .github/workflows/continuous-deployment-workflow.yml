@@ -11,7 +11,7 @@ on:
 jobs:
   image:
     name: Image Creation
-    runs-on: ubuntu-latest
+    runs-on: python:3.7-alpine
 
     env:
       DOCKER_IMAGE_NAME: cemdorst/puppet-parser

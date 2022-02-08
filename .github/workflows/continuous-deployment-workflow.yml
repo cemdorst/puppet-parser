@@ -27,7 +27,7 @@ jobs:
         docker login --username=$DOCKER_USER --password=$DOCKER_PASS
         docker build -t $DOCKER_IMAGE_NAME:$IMAGE_TAG -t $DOCKER_IMAGE_NAME:latest .
 
-    - name: Scan and Push
+    - name: Scan
       uses: anchore/scan-action@v3
       id: scan
       with:
@@ -35,14 +35,8 @@ jobs:
         fail-build: true
         severity-cutoff: high
         acs-report-enable: true
-    - name: upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: ${{ steps.scan.outputs.sarif }}
-    - name: Inspect action SARIF report
-      run: cat ${{ steps.scan.outputs.sarif }}
 
-    - name: push image to Dockerhub
+    - name: Push image to Dockerhub
       run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-latest
